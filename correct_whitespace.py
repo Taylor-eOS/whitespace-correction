@@ -5,7 +5,7 @@ import settings
 
 def get_output_file(input_file):
     p = Path(input_file)
-    return str(p.with_name("output").with_suffix(p.suffix))
+    return str(p.with_name(f"output_{p.stem}").with_suffix(p.suffix))
 
 def process_json_line(line, line_num, corrector):
     line = line.rstrip()
@@ -94,18 +94,12 @@ def print_statistics(stats):
     corr_err = _get("correction_error", "correction_errors")
     if corr_err is not None:
         print(f"Correction errors:          {corr_err}")
-    try:
-        print(f"Processed lines written to {OUTPUT_FILE}")
-    except Exception:
-        pass
 
-def main():
+if __name__ == "__main__":
     INPUT_FILE = input('Input file: ') or settings.INPUT_DEFAULT
     OUTPUT_FILE = get_output_file(INPUT_FILE)
     corrector = WhitespaceCorrector.from_pretrained(settings.MODEL_IDENTIFIER, device=settings.DEVICE)
     stats = process_file(input_file=INPUT_FILE, output_file=OUTPUT_FILE, corrector=corrector)
     print_statistics(stats)
-
-if __name__ == "__main__":
-    main()
+    print(f"Processed lines written to {OUTPUT_FILE}")
 
